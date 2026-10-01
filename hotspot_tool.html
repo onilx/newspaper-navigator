@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Newspaper Hotspot Builder</title>
+
+<style>
+
+html,
+body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#3a3128;
+    font-family:Arial,sans-serif;
+}
+
+#toolbar{
+    position:fixed;
+    top:10px;
+    right:10px;
+    width:450px;
+    z-index:9999;
+}
+
+#toolbar button{
+    padding:8px 12px;
+    margin-right:5px;
+    margin-bottom:8px;
+}
+
+#title,
+#url,
+#spotType{
+    width:100%;
+    box-sizing:border-box;
+    padding:8px;
+    margin-bottom:8px;
+}
+
+#output{
+    width:100%;
+    height:260px;
+    box-sizing:border-box;
+    font-family:Consolas,monospace;
+    font-size:13px;
+}
+
+#paperContainer{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    display:inline-block;
+}
+
+#paper{
+    display:block;
+    height:95vh;
+    width:auto;
+    box-shadow:0 20px 80px rgba(0,0,0,.6);
+
+    user-select:none;
+    -webkit-user-drag:none;
+}
+
+#selection{
+    position:absolute;
+    border:3px dashed lime;
+    background:rgba(0,255,0,.15);
+    display:none;
+    pointer-events:none;
+    box-sizing:border-box;
+}
+
+.savedHotspot{
+    position:absolute;
+    border:2px solid red;
+    background:rgba(255,0,0,.12);
+    box-sizing:border-box;
+    cursor:pointer;
+}
+
+.savedHotspot:hover{
+    background:rgba(255,255,0,.20);
+}
+
+.savedHotspotLabel{
+    position:absolute;
+    top:-20px;
+    left:0;
+    color:white;
+    font-size:11px;
+    padding:2px 5px;
+    white-space:nowrap;
+    pointer-events:none;
+}
+
+#status{
+    position:fixed;
+    left:10px;
+    bottom:10px;
+    background:rgba(0,0,0,.75);
+    color:white;
+    padding:10px;
+    border-radius:4px;
+}
+
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+
+    <button id="drawBtn">
+        Draw Mode OFF
+    </button>
+
+    <button id="copyBtn">
+        Copy HTML
+    </button>
+
+    <button id="exportBtn">
+        Export All
+    </button>
+
+    <input
+        id="title"
+        value="Article"
+        placeholder="Article Title">
+
+    <select id="spotType">
+
+        <option value="hotspot">
+            Hotspot (Zoom Article)
+        </option>
+
+        <option value="linkspot">
+            Linkspot (Navigate)
+        </option>
+
+    </select>
+
+    <input
+        id="url"
+        placeholder="URL (example: page2.html)">
+
+    <textarea id="output"></textarea>
+
+</div>
+
+<div id="paperContainer">
+
+    <img
+        id="paper"
+        src="targum_19801201_007.jpg"
+        draggable="false">
+
+    <div id="selection"></div>
+
+</div>
+
+<div id="status">
+    Draw Mode OFF
+</div>
+
+<script>
+
+const drawBtn =
+    document.getElementById("drawBtn");
+
+const copyBtn =
+    document.getElementById("copyBtn");
+
+const exportBtn =
+    document.getElementById("exportBtn");
+
+const titleBox =
+    document.getElementById("title");
+
+const spotType =
+    document.getElementById("spotType");
+
+const urlBox =
+    document.getElementById("url");
+
+const paperContainer =
+    document.getElementById("paperContainer");
+
+const paper =
+    document.getElementById("paper");
+
+const selection =
+    document.getElementById("selection");
+
+const output =
+    document.getElementById("output");
+
+const status =
+    document.getElementById("status");
+
+let drawMode = false;
+let firstPoint = null;
+let hotspots = [];
+
+/*******************************************
+DRAW MODE
+*******************************************/
+
+drawBtn.onclick = function(){
+
+    drawMode = !drawMode;
+
+    firstPoint = null;
+
+    selection.style.display =
+        "none";
+
+    drawBtn.textContent =
+        drawMode
+        ? "Draw Mode ON"
+        : "Draw Mode OFF";
+
+    status.textContent =
+        drawMode
+        ? "Click UPPER-LEFT corner"
+        : "Draw Mode OFF";
+};
+
+/*******************************************
+PAPER CLICK
+*******************************************/
+
+paper.addEventListener(
+    "click",
+    function(e){
+
+        if(!drawMode)
+            return;
+
+        const rect =
+            paper.getBoundingClientRect();
+
+        const x =
+            e.clientX - rect.left;
+
+        const y =
+            e.clientY - rect.top;
+
+        if(firstPoint === null){
+
+            firstPoint = {
+                x:x,
+                y:y
+            };
+
+            selection.style.display =
+                "block";
+
+            selection.style.left =
+                x + "px";
+
+            selection.style.top =
+                y + "px";
+
+            selection.style.width =
+                "4px";
+
+            selection.style.height =
+                "4px";
+
+            status.textContent =
+                "Click LOWER-RIGHT corner";
+
+            return;
+        }
+
+        const left =
+            Math.min(firstPoint.x,x);
+
+        const top =
+            Math.min(firstPoint.y,y);
+
+        const width =
+            Math.abs(x-firstPoint.x);
+
+        const height =
+            Math.abs(y-firstPoint.y);
+
+        selection.style.left =
+            left + "px";
+
+        selection.style.top =
+            top + "px";
+
+        selection.style.width =
+            width + "px";
+
+        selection.style.height =
+            height + "px";
+
+        const leftPct =
+            ((left / rect.width)
+            *100).toFixed(2);
+
+        const topPct =
+            ((top / rect.height)
+            *100).toFixed(2);
+
+        const widthPct =
+            ((width / rect.width)
+            *100).toFixed(2);
+
+        const heightPct =
+            ((height / rect.height)
+            *100).toFixed(2);
+
+        hotspots.push({
+
+            type:
+                spotType.value,
+
+            title:
+                titleBox.value,
+
+            url:
+                urlBox.value,
+
+            left:
+                leftPct,
+
+            top:
+                topPct,
+
+            width:
+                widthPct,
+
+            height:
+                heightPct
+        });
+
+        renderHotspots();
+        generateExport();
+
+        status.textContent =
+            `"${titleBox.value}" added`;
+
+        firstPoint = null;
+    });
+
+/*******************************************
+RENDER HOTSPOTS
+*******************************************/
+
+function renderHotspots(){
+
+    document
+        .querySelectorAll(".savedHotspot")
+        .forEach(x => x.remove());
+
+    hotspots.forEach(
+        (h,index)=>{
+
+        const box =
+            document.createElement("div");
+
+        box.className =
+            "savedHotspot";
+
+        if(h.type === "linkspot"){
+
+            box.style.border =
+                "2px solid blue";
+
+            box.style.background =
+                "rgba(0,0,255,.15)";
+
+        }else{
+
+            box.style.border =
+                "2px solid red";
+
+            box.style.background =
+                "rgba(255,0,0,.12)";
+        }
+
+        box.style.left =
+            h.left + "%";
+
+        box.style.top =
+            h.top + "%";
+
+        box.style.width =
+            h.width + "%";
+
+        box.style.height =
+            h.height + "%";
+
+        const label =
+            document.createElement("div");
+
+        label.className =
+            "savedHotspotLabel";
+
+        label.style.background =
+            h.type === "linkspot"
+            ? "blue"
+            : "red";
+
+        label.textContent =
+            `${h.type}: ${h.title}`;
+
+        box.appendChild(label);
+
+        box.addEventListener(
+            "dblclick",
+            function(e){
+
+                e.stopPropagation();
+
+                hotspots.splice(
+                    index,
+                    1
+                );
+
+                renderHotspots();
+                generateExport();
+
+                status.textContent =
+                    "Hotspot deleted";
+            });
+
+        paperContainer
+            .appendChild(box);
+    });
+}
+
+/*******************************************
+EXPORT
+*******************************************/
+
+function generateExport(){
+
+    output.value =
+
+        hotspots.map(h => {
+
+            const cls =
+                h.type;
+
+            return `<div
+    class="${cls}"
+    data-title="${h.title}"
+    data-url="${h.url}"
+    style="
+        left:${h.left}%;
+        top:${h.top}%;
+        width:${h.width}%;
+        height:${h.height}%;
+    ">
+</div>`;
+
+        }).join("\n\n");
+}
+
+exportBtn.onclick =
+    generateExport;
+
+/*******************************************
+COPY
+*******************************************/
+
+copyBtn.onclick =
+async function(){
+
+    if(output.value==="")
+        return;
+
+    try{
+
+        await navigator
+            .clipboard
+            .writeText(
+                output.value
+            );
+
+        status.textContent =
+            "Copied to clipboard";
+
+    }catch{
+
+        output.select();
+
+        document.execCommand(
+            "copy"
+        );
+
+        status.textContent =
+            "Copied";
+    }
+};
+
+</script>
+
+</body>
+</html>
