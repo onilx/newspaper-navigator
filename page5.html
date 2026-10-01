@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Newspaper Viewer</title>
+
+<style>
+
+html,
+body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#3a3128;
+}
+
+#viewer{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    transform-origin:center center;
+    transition:transform 0.8s cubic-bezier(.22,.61,.36,1);
+}
+
+#page{
+    display:block;
+    height:95vh;
+    width:auto;
+    box-shadow:0 25px 80px rgba(0,0,0,.6);
+}
+
+/* Container for hotspots */
+#hotspots{
+    position:absolute;
+    inset:0;
+}
+
+<!--
+
+/* Visible hotspot boxes */
+.hotspot{
+    position:absolute;
+    border:2px solid red;
+    background:rgba(255,0,0,.12);
+    box-sizing:border-box;
+    cursor:pointer;
+}
+
+-->
+
+.hotspot:hover{
+    background:transparent;
+}
+
+.linkspot{
+    position:absolute;
+
+    border:2px solid blue;
+
+    background:
+        rgba(0,0,255,.15);
+
+    box-sizing:border-box;
+
+    cursor:pointer;
+}
+<!--
+.linkspot:hover{
+
+    background:
+        rgba(0,255,255,.20);
+}
+-->
+
+.hotspot,
+.linkspot{
+    position:absolute;
+    border:none;
+    background:transparent;
+    box-sizing:border-box;
+    cursor:pointer;
+}
+
+
+#status{
+    position:fixed;
+    left:10px;
+    bottom:10px;
+    padding:8px 12px;
+    background:rgba(0,0,0,.70);
+    color:white;
+    font-family:Arial,sans-serif;
+    border-radius:4px;
+    z-index:1000;
+
+    cursor:default;
+}
+
+#status.linkReady{
+    cursor:pointer;
+}
+
+</style>
+</head>
+<body>
+
+<div id="viewer">
+
+    <img
+        id="page"
+        src="targum_19801201_005.jpg"
+        alt="Newspaper">
+
+    <div id="hotspots">
+
+<!--/********************************************
+PASTE BELOW HERE
+********************************************/-->
+
+<div
+    class="hotspot"
+    data-title="Letters"
+    data-url="letter.html"
+    style="
+        left:7.77%;
+        top:7.26%;
+        width:84.09%;
+        height:40.08%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Subliminal Seduction"
+    data-url="SubliminalSeduction.html"
+    style="
+        left:42.15%;
+        top:24.89%;
+        width:47.87%;
+        height:27.77%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Abortion Services"
+    data-url="AbortionServices.html"
+    style="
+        left:8.69%;
+        top:47.97%;
+        width:31.23%;
+        height:19.40%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Village Vamp"
+    data-url="VillageVamp.html"
+    style="
+        left:8.88%;
+        top:67.63%;
+        width:31.97%;
+        height:28.41%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Carlsberg"
+    data-url="Carlsberg.html"
+    style="
+        left:42.15%;
+        top:53.42%;
+        width:48.79%;
+        height:42.74%;
+    ">
+</div>
+
+<div
+    class="linkspot"
+    data-title="Page 4"
+    data-url="page4.html"
+    style="
+        left:0.19%;
+        top:1.81%;
+        width:5.73%;
+        height:96.39%;
+    ">
+</div>
+
+<div
+    class="linkspot"
+    data-title="Page 6"
+    data-url="page6.html"
+    style="
+        left:90.38%;
+        top:2.06%;
+        width:7.58%;
+        height:96.51%;
+    ">
+</div>
+
+<!--/********************************************
+PASTE ABOVE HERE
+********************************************/-->
+
+    </div>
+
+</div>
+
+<div id="status">
+    Click a hotspot. Double-click anywhere to reset.
+</div>
+
+<script>
+
+const viewer =
+    document.getElementById("viewer");
+
+const status =
+    document.getElementById("status");
+
+let currentArticleUrl = null;
+
+/********************************************
+STATUS CLICK
+********************************************/
+
+status.addEventListener(
+    "click",
+    function(){
+
+        if(!currentArticleUrl)
+            return;
+
+        window.location.href =
+            currentArticleUrl;
+    });
+
+/********************************************
+HOTSPOT CLICK
+********************************************/
+
+document
+    .querySelectorAll(".hotspot")
+    .forEach(hotspot => {
+
+        hotspot.addEventListener(
+            "click",
+            function(e){
+
+                e.stopPropagation();
+
+                zoomToHotspot(
+                    hotspot
+                );
+
+            });
+    });
+
+function zoomToHotspot(hotspot){
+
+    const rect =
+        hotspot.getBoundingClientRect();
+
+    const centerX =
+        rect.left +
+        rect.width / 2;
+
+    const centerY =
+        rect.top +
+        rect.height / 2;
+
+    const zoom = Math.min(
+
+        window.innerWidth /
+        (rect.width * 1.15),
+
+        window.innerHeight /
+        (rect.height * 1.15)
+
+    );
+
+    const tx =
+        (window.innerWidth / 2
+        - centerX) * zoom;
+
+    const ty =
+        (window.innerHeight / 2
+        - centerY) * zoom;
+
+    viewer.style.transform =
+
+        `
+        translate(-50%,-50%)
+        translate(${tx}px,${ty}px)
+        scale(${zoom})
+        `;
+
+    currentArticleUrl =
+        hotspot.dataset.url || null;
+
+if(currentArticleUrl){
+
+    status.textContent =
+        "Read: " +
+        hotspot.dataset.title;
+
+    status.classList.add(
+        "linkReady"
+    );
+
+}else{
+
+    status.textContent =
+        hotspot.dataset.title;
+
+    status.classList.remove(
+        "linkReady"
+    );
+}
+}
+
+/********************************************
+RESET
+********************************************/
+
+function resetView(){
+
+currentArticleUrl = null;
+
+status.classList.remove(
+    "linkReady"
+);
+
+    viewer.style.transform =
+        "translate(-50%,-50%) scale(1)";
+
+    status.textContent =
+        "Click a hotspot. Double-click anywhere to reset.";
+}
+
+document.addEventListener(
+    "dblclick",
+    function(e){
+
+        e.preventDefault();
+
+        resetView();
+
+    });
+
+/********************************************
+LINKSPOTS
+********************************************/
+
+document
+    .querySelectorAll(".linkspot")
+    .forEach(link => {
+
+        link.addEventListener(
+            "click",
+            function(e){
+
+                e.stopPropagation();
+
+                window.location.href =
+                    link.dataset.url;
+
+            });
+    });
+
+</script>
+
+</body>
+</html>

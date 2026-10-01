@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Newspaper Viewer</title>
+
+<style>
+
+html,
+body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#3a3128;
+}
+
+#viewer{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    transform-origin:center center;
+    transition:transform 0.8s cubic-bezier(.22,.61,.36,1);
+}
+
+#page{
+    display:block;
+    height:95vh;
+    width:auto;
+    box-shadow:0 25px 80px rgba(0,0,0,.6);
+}
+
+/* Container for hotspots */
+#hotspots{
+    position:absolute;
+    inset:0;
+}
+
+<!--
+
+/* Visible hotspot boxes */
+.hotspot{
+    position:absolute;
+    border:2px solid red;
+    background:rgba(255,0,0,.12);
+    box-sizing:border-box;
+    cursor:pointer;
+}
+
+-->
+
+.hotspot:hover{
+    background:transparent;
+}
+
+.linkspot{
+    position:absolute;
+
+    border:2px solid blue;
+
+    background:
+        rgba(0,0,255,.15);
+
+    box-sizing:border-box;
+
+    cursor:pointer;
+}
+<!--
+.linkspot:hover{
+
+    background:
+        rgba(0,255,255,.20);
+}
+-->
+
+.hotspot,
+.linkspot{
+    position:absolute;
+    border:none;
+    background:transparent;
+    box-sizing:border-box;
+    cursor:pointer;
+}
+
+
+#status{
+    position:fixed;
+    left:10px;
+    bottom:10px;
+    padding:8px 12px;
+    background:rgba(0,0,0,.70);
+    color:white;
+    font-family:Arial,sans-serif;
+    border-radius:4px;
+    z-index:1000;
+
+    cursor:default;
+}
+
+#status.linkReady{
+    cursor:pointer;
+}
+
+</style>
+</head>
+<body>
+
+<div id="viewer">
+
+    <img
+        id="page"
+        src="targum_19801201_003.jpg"
+        alt="Newspaper">
+
+    <div id="hotspots">
+
+<!--/********************************************
+PASTE BELOW HERE
+********************************************/-->
+
+<div
+    class="hotspot"
+    data-title="Commuter services unpatronized"
+    data-url="CommuterServicesUnpatronized.html"
+    style="
+        left:7.67%;
+        top:7.42%;
+        width:49.41%;
+        height:25.42%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Fraternity recognizes black achievements"
+    data-url="fratrec.html"
+    style="
+        left:57.42%;
+        top:7.42%;
+        width:33.05%;
+        height:39.40%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Croatian folk dancing to be taught"
+    data-url="folkdance.html"
+    style="
+        left:6.32%;
+        top:29.49%;
+        width:18.04%;
+        height:31.20%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Moevs to be honored tomorrow"
+    data-url="moevs.html"
+    style="
+        left:24.70%;
+        top:33.07%;
+        width:49.92%;
+        height:29.35%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Pegasus"
+    data-url="Pegasus.html"
+    style="
+        left:40.89%;
+        top:47.28%;
+        width:51.10%;
+        height:47.26%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Income Opportunity"
+    data-url="IncomeOpportunity.html"
+    style="
+        left:7.33%;
+        top:61.15%;
+        width:32.72%;
+        height:16.64%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Mike"
+    data-url="Mike.html"
+    style="
+        left:8.68%;
+        top:78.25%;
+        width:31.37%;
+        height:16.18%;
+    ">
+</div>
+
+<div
+    class="linkspot"
+    data-title="page 4"
+    data-url="Page4.html"
+    style="
+        left:89.46%;
+        top:1.87%;
+        width:9.28%;
+        height:97.29%;
+    ">
+</div>
+
+<div
+    class="linkspot"
+    data-title="page 2"
+    data-url="page2.html"
+    style="
+        left:1.67%;
+        top:0.95%;
+        width:6.57%;
+        height:96.71%;
+    ">
+</div>
+
+<!--/********************************************
+PASTE ABOVE HERE
+********************************************/-->
+
+    </div>
+
+</div>
+
+<div id="status">
+    Click a hotspot. Double-click anywhere to reset.
+</div>
+
+<script>
+
+const viewer =
+    document.getElementById("viewer");
+
+const status =
+    document.getElementById("status");
+
+let currentArticleUrl = null;
+
+/********************************************
+STATUS CLICK
+********************************************/
+
+status.addEventListener(
+    "click",
+    function(){
+
+        if(!currentArticleUrl)
+            return;
+
+        window.location.href =
+            currentArticleUrl;
+    });
+
+/********************************************
+HOTSPOT CLICK
+********************************************/
+
+document
+    .querySelectorAll(".hotspot")
+    .forEach(hotspot => {
+
+        hotspot.addEventListener(
+            "click",
+            function(e){
+
+                e.stopPropagation();
+
+                zoomToHotspot(
+                    hotspot
+                );
+
+            });
+    });
+
+function zoomToHotspot(hotspot){
+
+    const rect =
+        hotspot.getBoundingClientRect();
+
+    const centerX =
+        rect.left +
+        rect.width / 2;
+
+    const centerY =
+        rect.top +
+        rect.height / 2;
+
+    const zoom = Math.min(
+
+        window.innerWidth /
+        (rect.width * 1.15),
+
+        window.innerHeight /
+        (rect.height * 1.15)
+
+    );
+
+    const tx =
+        (window.innerWidth / 2
+        - centerX) * zoom;
+
+    const ty =
+        (window.innerHeight / 2
+        - centerY) * zoom;
+
+    viewer.style.transform =
+
+        `
+        translate(-50%,-50%)
+        translate(${tx}px,${ty}px)
+        scale(${zoom})
+        `;
+
+    currentArticleUrl =
+        hotspot.dataset.url || null;
+
+if(currentArticleUrl){
+
+    status.textContent =
+        "Read: " +
+        hotspot.dataset.title;
+
+    status.classList.add(
+        "linkReady"
+    );
+
+}else{
+
+    status.textContent =
+        hotspot.dataset.title;
+
+    status.classList.remove(
+        "linkReady"
+    );
+}
+}
+
+/********************************************
+RESET
+********************************************/
+
+function resetView(){
+
+currentArticleUrl = null;
+
+status.classList.remove(
+    "linkReady"
+);
+
+    viewer.style.transform =
+        "translate(-50%,-50%) scale(1)";
+
+    status.textContent =
+        "Click a hotspot. Double-click anywhere to reset.";
+}
+
+document.addEventListener(
+    "dblclick",
+    function(e){
+
+        e.preventDefault();
+
+        resetView();
+
+    });
+
+/********************************************
+LINKSPOTS
+********************************************/
+
+document
+    .querySelectorAll(".linkspot")
+    .forEach(link => {
+
+        link.addEventListener(
+            "click",
+            function(e){
+
+                e.stopPropagation();
+
+                window.location.href =
+                    link.dataset.url;
+
+            });
+    });
+
+</script>
+
+</body>
+</html>

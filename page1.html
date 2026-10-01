@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Newspaper Viewer</title>
+
+<style>
+
+html,
+body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#3a3128;
+}
+
+#viewer{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    transform-origin:center center;
+    transition:transform 0.8s cubic-bezier(.22,.61,.36,1);
+}
+
+#page{
+    display:block;
+    height:95vh;
+    width:auto;
+    box-shadow:0 25px 80px rgba(0,0,0,.6);
+}
+
+/* Container for hotspots */
+#hotspots{
+    position:absolute;
+    inset:0;
+}
+
+<!--
+
+/* Visible hotspot boxes */
+.hotspot{
+    position:absolute;
+    border:2px solid red;
+    background:rgba(255,0,0,.12);
+    box-sizing:border-box;
+    cursor:pointer;
+}
+
+-->
+
+.hotspot:hover{
+    background:transparent;
+}
+
+.linkspot{
+    position:absolute;
+
+    border:2px solid blue;
+
+    background:
+        rgba(0,0,255,.15);
+
+    box-sizing:border-box;
+
+    cursor:pointer;
+}
+<!--
+.linkspot:hover{
+
+    background:
+        rgba(0,255,255,.20);
+}
+-->
+
+.hotspot,
+.linkspot{
+    position:absolute;
+    border:none;
+    background:transparent;
+    box-sizing:border-box;
+    cursor:pointer;
+}
+
+
+#status{
+    position:fixed;
+    left:10px;
+    bottom:10px;
+    padding:8px 12px;
+    background:rgba(0,0,0,.70);
+    color:white;
+    font-family:Arial,sans-serif;
+    border-radius:4px;
+    z-index:1000;
+
+    cursor:default;
+}
+
+#status.linkReady{
+    cursor:pointer;
+}
+
+</style>
+</head>
+<body>
+
+<div id="viewer">
+
+    <img
+        id="page"
+        src="targum_19801201_001.jpg"
+        alt="Newspaper">
+
+    <div id="hotspots">
+
+<!--/********************************************
+PASTE BELOW HERE
+********************************************/-->
+
+<div
+    class="hotspot"
+    data-title="TAG bill lobbying effort now centered on Byrne"
+    data-url="page6.html"
+    style="
+        left:9.08%;
+        top:12.74%;
+        width:82.19%;
+        height:33.39%;
+    ">
+</div>
+
+<div
+    class="linkspot"
+    data-title="cont page 6"
+    data-url="page6.html"
+    style="
+        left:75.09%;
+        top:44.97%;
+        width:16.00%;
+        height:1.16%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Princeton students approve fee to support New Jersey PIRG"
+    data-url="NJPIRG.html"
+    style="
+        left:8.23%;
+        top:41.85%;
+        width:50.69%;
+        height:22.07%;
+    ">
+</div>
+
+<div
+    class="linkspot"
+    data-title="cont page 9"
+    data-url="page9.html"
+    style="
+        left:44.61%;
+        top:62.42%;
+        width:10.95%;
+        height:1.39%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Pre-Kwanza celebration aimed at sharing customs, ideologies"
+    data-url="Kwanza.html"
+    style="
+        left:8.74%;
+        top:64.39%;
+        width:49.68%;
+        height:18.49%;
+    ">
+</div>
+
+<div
+    class="linkspot"
+    data-title="cont page 8"
+    data-url="page8.html"
+    style="
+        left:44.95%;
+        top:82.30%;
+        width:10.44%;
+        height:0.92%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Superman Pic"
+    data-url="superman.html"
+    style="
+        left:59.43%;
+        top:46.71%;
+        width:31.32%;
+        height:36.17%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Index"
+    data-url="index.html"
+    style="
+        left:38.38%;
+        top:84.14%;
+        width:18.69%;
+        height:9.59%;
+    ">
+</div>
+
+<div
+    class="linkspot"
+    data-title="Classifieds"
+    data-url="page11.html"
+    style="
+        left:39.56%;
+        top:87.73%;
+        width:16.50%;
+        height:0.92%;
+    ">
+</div>
+
+<div
+    class="linkspot"
+    data-title="Doonesbury"
+    data-url="page4.html"
+    style="
+        left:39.56%;
+        top:88.54%;
+        width:16.50%;
+        height:0.81%;
+    ">
+</div>
+
+<div
+    class="linkspot"
+    data-title="Editorial"
+    data-url="page4.html"
+    style="
+        left:39.56%;
+        top:89.46%;
+        width:16.84%;
+        height:0.81%;
+    ">
+</div>
+
+<div
+    class="linkspot"
+    data-title="Local News"
+    data-url="page3.html"
+    style="
+        left:39.39%;
+        top:90.15%;
+        width:16.84%;
+        height:0.92%;
+    ">
+</div>
+
+<div
+    class="linkspot"
+    data-title="Sports"
+    data-url="page12.html"
+    style="
+        left:39.56%;
+        top:90.85%;
+        width:16.50%;
+        height:1.16%;
+    ">
+</div>
+
+<div
+    class="linkspot"
+    data-title="World & National News"
+    data-url="page2.html"
+    style="
+        left:39.73%;
+        top:91.77%;
+        width:16.34%;
+        height:0.92%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Weekend meeting"
+    data-url="weekendmeeting.html"
+    style="
+        left:57.41%;
+        top:84.26%;
+        width:17.35%;
+        height:9.71%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Weather"
+    data-url="weather.html"
+    style="
+        left:75.26%;
+        top:84.61%;
+        width:15.16%;
+        height:9.24%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Masthead"
+    data-url="masthead.html"
+    style="
+        left:9.08%;
+        top:4.19%;
+        width:82.69%;
+        height:8.44%;
+    ">
+</div>
+
+<div
+    class="linkspot"
+    data-title="Editorial Staff"
+    data-url="page4.html"
+    style="
+        left:9.41%;
+        top:10.89%;
+        width:7.92%;
+        height:1.96%;
+    ">
+</div>
+
+<!--/********************************************
+PASTE ABOVE HERE
+********************************************/-->
+
+    </div>
+
+</div>
+
+<div id="status">
+    Click a hotspot. Double-click anywhere to reset.
+</div>
+
+<script>
+
+const viewer =
+    document.getElementById("viewer");
+
+const status =
+    document.getElementById("status");
+
+let currentArticleUrl = null;
+
+/********************************************
+STATUS CLICK
+********************************************/
+
+status.addEventListener(
+    "click",
+    function(){
+
+        if(!currentArticleUrl)
+            return;
+
+        window.location.href =
+            currentArticleUrl;
+    });
+
+/********************************************
+HOTSPOT CLICK
+********************************************/
+
+document
+    .querySelectorAll(".hotspot")
+    .forEach(hotspot => {
+
+        hotspot.addEventListener(
+            "click",
+            function(e){
+
+                e.stopPropagation();
+
+                zoomToHotspot(
+                    hotspot
+                );
+
+            });
+    });
+
+function zoomToHotspot(hotspot){
+
+    const rect =
+        hotspot.getBoundingClientRect();
+
+    const centerX =
+        rect.left +
+        rect.width / 2;
+
+    const centerY =
+        rect.top +
+        rect.height / 2;
+
+    const zoom = Math.min(
+
+        window.innerWidth /
+        (rect.width * 1.15),
+
+        window.innerHeight /
+        (rect.height * 1.15)
+
+    );
+
+    const tx =
+        (window.innerWidth / 2
+        - centerX) * zoom;
+
+    const ty =
+        (window.innerHeight / 2
+        - centerY) * zoom;
+
+    viewer.style.transform =
+
+        `
+        translate(-50%,-50%)
+        translate(${tx}px,${ty}px)
+        scale(${zoom})
+        `;
+
+    currentArticleUrl =
+        hotspot.dataset.url || null;
+
+if(currentArticleUrl){
+
+    status.textContent =
+        "Read: " +
+        hotspot.dataset.title;
+
+    status.classList.add(
+        "linkReady"
+    );
+
+}else{
+
+    status.textContent =
+        hotspot.dataset.title;
+
+    status.classList.remove(
+        "linkReady"
+    );
+}
+}
+
+/********************************************
+RESET
+********************************************/
+
+function resetView(){
+
+currentArticleUrl = null;
+
+status.classList.remove(
+    "linkReady"
+);
+
+    viewer.style.transform =
+        "translate(-50%,-50%) scale(1)";
+
+    status.textContent =
+        "Click a hotspot. Double-click anywhere to reset.";
+}
+
+document.addEventListener(
+    "dblclick",
+    function(e){
+
+        e.preventDefault();
+
+        resetView();
+
+    });
+
+/********************************************
+LINKSPOTS
+********************************************/
+
+document
+    .querySelectorAll(".linkspot")
+    .forEach(link => {
+
+        link.addEventListener(
+            "click",
+            function(e){
+
+                e.stopPropagation();
+
+                window.location.href =
+                    link.dataset.url;
+
+            });
+    });
+
+</script>
+
+</body>
+</html>
