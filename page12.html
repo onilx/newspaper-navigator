@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Newspaper Viewer</title>
+
+<style>
+
+html,
+body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#3a3128;
+}
+
+#viewer{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    transform-origin:center center;
+    transition:transform 0.8s cubic-bezier(.22,.61,.36,1);
+}
+
+#page{
+    display:block;
+    height:95vh;
+    width:auto;
+    box-shadow:0 25px 80px rgba(0,0,0,.6);
+}
+
+/* Container for hotspots */
+#hotspots{
+    position:absolute;
+    inset:0;
+}
+
+<!--
+
+/* Visible hotspot boxes */
+.hotspot{
+    position:absolute;
+    border:2px solid red;
+    background:rgba(255,0,0,.12);
+    box-sizing:border-box;
+    cursor:pointer;
+}
+
+-->
+
+.hotspot:hover{
+    background:transparent;
+}
+
+.linkspot{
+    position:absolute;
+
+    border:2px solid blue;
+
+    background:
+        rgba(0,0,255,.15);
+
+    box-sizing:border-box;
+
+    cursor:pointer;
+}
+<!--
+.linkspot:hover{
+
+    background:
+        rgba(0,255,255,.20);
+}
+-->
+
+.hotspot,
+.linkspot{
+    position:absolute;
+    border:none;
+    background:transparent;
+    box-sizing:border-box;
+    cursor:pointer;
+}
+
+
+#status{
+    position:fixed;
+    left:10px;
+    bottom:10px;
+    padding:8px 12px;
+    background:rgba(0,0,0,.70);
+    color:white;
+    font-family:Arial,sans-serif;
+    border-radius:4px;
+    z-index:1000;
+
+    cursor:default;
+}
+
+#status.linkReady{
+    cursor:pointer;
+}
+
+</style>
+</head>
+<body>
+
+<div id="viewer">
+
+    <img
+        id="page"
+        src="targum_19801201_012.jpg"
+        alt="Newspaper">
+
+    <div id="hotspots">
+
+<!--/********************************************
+PASTE BELOW HERE
+********************************************/-->
+
+<div
+    class="hotspot"
+    data-title="Knights win opener over Americans 75-62"
+    data-url="knightswinAmerica.html"
+    style="
+        left:44.62%;
+        top:17.47%;
+        width:48.08%;
+        height:42.87%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Knights win opener over Americans 75-62"
+    data-url="knightswinAmerica.html"
+    style="
+        left:12.01%;
+        top:12.16%;
+        width:31.60%;
+        height:34.66%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Philly win streak snapped Jets Giants lose"
+    data-url="jetsgiantslose.html"
+    style="
+        left:11.50%;
+        top:47.05%;
+        width:64.22%;
+        height:47.61%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Women top LaSalle as Olkowski shines"
+    data-url="jetsgiantslose.html"
+    style="
+        left:27.31%;
+        top:59.99%;
+        width:32.78%;
+        height:34.90%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Women top LaSalle as Olkowski shines"
+    data-url="jetsgiantslose.html"
+    style="
+        left:60.42%;
+        top:60.34%;
+        width:31.94%;
+        height:34.55%;
+    ">
+</div>
+
+<div
+    class="linkspot"
+    data-title="page11"
+    data-url="page11.html"
+    style="
+        left:1.25%;
+        top:1.41%;
+        width:10.59%;
+        height:96.14%;
+    ">
+</div>
+
+<div
+    class="linkspot"
+    data-title="continued on page 10"
+    data-url="page10.html"
+    style="
+        left:79.08%;
+        top:59.19%;
+        width:10.59%;
+        height:1.04%;
+    ">
+</div>
+
+<div
+    class="linkspot"
+    data-title="continued on page 10"
+    data-url="page10.html"
+    style="
+        left:37.73%;
+        top:93.74%;
+        width:10.59%;
+        height:1.04%;
+    ">
+</div>
+
+<!--/********************************************
+PASTE ABOVE HERE
+********************************************/-->
+
+    </div>
+
+</div>
+
+<div id="status">
+    Click a hotspot. Double-click anywhere to reset.
+</div>
+
+<script>
+
+const viewer =
+    document.getElementById("viewer");
+
+const status =
+    document.getElementById("status");
+
+let currentArticleUrl = null;
+
+/********************************************
+STATUS CLICK
+********************************************/
+
+status.addEventListener(
+    "click",
+    function(){
+
+        if(!currentArticleUrl)
+            return;
+
+        window.location.href =
+            currentArticleUrl;
+    });
+
+/********************************************
+HOTSPOT CLICK
+********************************************/
+
+document
+    .querySelectorAll(".hotspot")
+    .forEach(hotspot => {
+
+        hotspot.addEventListener(
+            "click",
+            function(e){
+
+                e.stopPropagation();
+
+                zoomToHotspot(
+                    hotspot
+                );
+
+            });
+    });
+
+function zoomToHotspot(hotspot){
+
+    const rect =
+        hotspot.getBoundingClientRect();
+
+    const centerX =
+        rect.left +
+        rect.width / 2;
+
+    const centerY =
+        rect.top +
+        rect.height / 2;
+
+    const zoom = Math.min(
+
+        window.innerWidth /
+        (rect.width * 1.15),
+
+        window.innerHeight /
+        (rect.height * 1.15)
+
+    );
+
+    const tx =
+        (window.innerWidth / 2
+        - centerX) * zoom;
+
+    const ty =
+        (window.innerHeight / 2
+        - centerY) * zoom;
+
+    viewer.style.transform =
+
+        `
+        translate(-50%,-50%)
+        translate(${tx}px,${ty}px)
+        scale(${zoom})
+        `;
+
+    currentArticleUrl =
+        hotspot.dataset.url || null;
+
+if(currentArticleUrl){
+
+    status.textContent =
+        "Read: " +
+        hotspot.dataset.title;
+
+    status.classList.add(
+        "linkReady"
+    );
+
+}else{
+
+    status.textContent =
+        hotspot.dataset.title;
+
+    status.classList.remove(
+        "linkReady"
+    );
+}
+}
+
+/********************************************
+RESET
+********************************************/
+
+function resetView(){
+
+currentArticleUrl = null;
+
+status.classList.remove(
+    "linkReady"
+);
+
+    viewer.style.transform =
+        "translate(-50%,-50%) scale(1)";
+
+    status.textContent =
+        "Click a hotspot. Double-click anywhere to reset.";
+}
+
+document.addEventListener(
+    "dblclick",
+    function(e){
+
+        e.preventDefault();
+
+        resetView();
+
+    });
+
+/********************************************
+LINKSPOTS
+********************************************/
+
+document
+    .querySelectorAll(".linkspot")
+    .forEach(link => {
+
+        link.addEventListener(
+            "click",
+            function(e){
+
+                e.stopPropagation();
+
+                window.location.href =
+                    link.dataset.url;
+
+            });
+    });
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Newspaper Viewer</title>
+
+<style>
+
+html,
+body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#3a3128;
+}
+
+#viewer{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    transform-origin:center center;
+    transition:transform 0.8s cubic-bezier(.22,.61,.36,1);
+}
+
+#page{
+    display:block;
+    height:95vh;
+    width:auto;
+    box-shadow:0 25px 80px rgba(0,0,0,.6);
+}
+
+/* Container for hotspots */
+#hotspots{
+    position:absolute;
+    inset:0;
+}
+
+<!--
+
+/* Visible hotspot boxes */
+.hotspot{
+    position:absolute;
+    border:2px solid red;
+    background:rgba(255,0,0,.12);
+    box-sizing:border-box;
+    cursor:pointer;
+}
+
+-->
+
+.hotspot:hover{
+    background:transparent;
+}
+
+.linkspot{
+    position:absolute;
+
+    border:2px solid blue;
+
+    background:
+        rgba(0,0,255,.15);
+
+    box-sizing:border-box;
+
+    cursor:pointer;
+}
+<!--
+.linkspot:hover{
+
+    background:
+        rgba(0,255,255,.20);
+}
+-->
+
+.hotspot,
+.linkspot{
+    position:absolute;
+    border:none;
+    background:transparent;
+    box-sizing:border-box;
+    cursor:pointer;
+}
+
+
+#status{
+    position:fixed;
+    left:10px;
+    bottom:10px;
+    padding:8px 12px;
+    background:rgba(0,0,0,.70);
+    color:white;
+    font-family:Arial,sans-serif;
+    border-radius:4px;
+    z-index:1000;
+
+    cursor:default;
+}
+
+#status.linkReady{
+    cursor:pointer;
+}
+
+</style>
+</head>
+<body>
+
+<div id="viewer">
+
+    <img
+        id="page"
+        src="targum_19801201_011.jpg"
+        alt="Newspaper">
+
+    <div id="hotspots">
+
+<!--/********************************************
+PASTE BELOW HERE
+********************************************/-->
+
+<div
+    class="hotspot"
+    data-title="Apartments"
+    data-url="apartments.html"
+    style="
+        left:8.70%;
+        top:7.54%;
+        width:15.51%;
+        height:11.90%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Wheels"
+    data-url="wheels.html"
+    style="
+        left:9.04%;
+        top:19.90%;
+        width:14.83%;
+        height:5.66%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="On the Market"
+    data-url="onthemarket.html"
+    style="
+        left:8.70%;
+        top:26.02%;
+        width:15.51%;
+        height:11.67%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Services"
+    data-url="services.html"
+    style="
+        left:8.87%;
+        top:37.93%;
+        width:15.51%;
+        height:10.05%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Help Wanted M/F"
+    data-url="helpwantedmf.html"
+    style="
+        left:8.87%;
+        top:48.44%;
+        width:15.17%;
+        height:17.56%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Events"
+    data-url="events.html"
+    style="
+        left:8.53%;
+        top:66.12%;
+        width:15.85%;
+        height:16.18%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Photo Club"
+    data-url="photoclub.html"
+    style="
+        left:8.87%;
+        top:82.64%;
+        width:15.34%;
+        height:11.09%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Clockwork Orange"
+    data-url="clockworkorange.html"
+    style="
+        left:25.73%;
+        top:7.65%;
+        width:14.67%;
+        height:11.21%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Lake Placid Olympics"
+    data-url="olympics.html"
+    style="
+        left:25.22%;
+        top:18.98%;
+        width:15.34%;
+        height:17.56%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="LOCO Presents"
+    data-url="LOCO.html"
+    style="
+        left:25.22%;
+        top:37.12%;
+        width:15.34%;
+        height:17.10%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Summer in France"
+    data-url="summerinfrance.html"
+    style="
+        left:25.05%;
+        top:54.56%;
+        width:16.01%;
+        height:37.67%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Ski Club"
+    data-url="skiclub.html"
+    style="
+        left:41.07%;
+        top:7.65%;
+        width:16.18%;
+        height:17.22%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Outdoors Club"
+    data-url="outdoorsclub.html"
+    style="
+        left:41.23%;
+        top:25.45%;
+        width:15.68%;
+        height:11.32%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Steve McQueen Film Festival"
+    data-url="SteveMcQueenFilmFestival.html"
+    style="
+        left:41.91%;
+        top:37.35%;
+        width:15.34%;
+        height:17.45%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Ski Vermont"
+    data-url="vermont.html"
+    style="
+        left:41.91%;
+        top:55.03%;
+        width:15.34%;
+        height:11.21%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Nutcracker"
+    data-url="nutcracker.html"
+    style="
+        left:42.08%;
+        top:66.70%;
+        width:15.00%;
+        height:11.21%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Hanukka Relay"
+    data-url="HanukkaRelay.html"
+    style="
+        left:42.08%;
+        top:78.60%;
+        width:15.17%;
+        height:11.55%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="reducing anxiety about tests"
+    data-url="testanxiety.html"
+    style="
+        left:8.87%;
+        top:94.31%;
+        width:15.00%;
+        height:1.85%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="stratton ski weeks"
+    data-url="strattonskiweeks.html"
+    style="
+        left:25.05%;
+        top:93.39%;
+        width:16.01%;
+        height:2.66%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="personals"
+    data-url="personals.html"
+    style="
+        left:41.91%;
+        top:90.38%;
+        width:15.51%;
+        height:5.78%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="personals"
+    data-url="personals.html"
+    style="
+        left:57.75%;
+        top:7.30%;
+        width:16.18%;
+        height:9.47%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="personals"
+    data-url="personals.html"
+    style="
+        left:57.92%;
+        top:17.01%;
+        width:15.85%;
+        height:9.24%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="personals"
+    data-url="personals.html"
+    style="
+        left:58.09%;
+        top:26.60%;
+        width:15.51%;
+        height:5.78%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="personals"
+    data-url="personals.html"
+    style="
+        left:57.75%;
+        top:32.73%;
+        width:16.01%;
+        height:10.40%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="write about energy"
+    data-url="writeenergy.html"
+    style="
+        left:57.75%;
+        top:43.59%;
+        width:16.18%;
+        height:18.14%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="personals"
+    data-url="personals.html"
+    style="
+        left:57.92%;
+        top:62.07%;
+        width:16.01%;
+        height:5.89%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="lost and found"
+    data-url="LNF.html"
+    style="
+        left:58.26%;
+        top:68.31%;
+        width:15.51%;
+        height:4.74%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="lost and found"
+    data-url="LNF.html"
+    style="
+        left:74.27%;
+        top:7.07%;
+        width:15.34%;
+        height:6.12%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="wanted"
+    data-url="wanted.html"
+    style="
+        left:74.44%;
+        top:13.54%;
+        width:15.34%;
+        height:7.63%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="roomates"
+    data-url="roomates.html"
+    style="
+        left:74.27%;
+        top:21.75%;
+        width:15.17%;
+        height:7.28%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="miscellaneous"
+    data-url="misc.html"
+    style="
+        left:74.27%;
+        top:29.37%;
+        width:15.68%;
+        height:7.63%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="birthdays"
+    data-url="birthdays.html"
+    style="
+        left:74.44%;
+        top:37.35%;
+        width:15.17%;
+        height:16.87%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="birthdays"
+    data-url="birthdays.html"
+    style="
+        left:74.61%;
+        top:54.68%;
+        width:15.51%;
+        height:18.49%;
+    ">
+</div>
+
+<div
+    class="hotspot"
+    data-title="Racquet Club"
+    data-url="RacquetClub.html"
+    style="
+        left:58.43%;
+        top:73.75%;
+        width:31.86%;
+        height:22.53%;
+    ">
+</div>
+
+<div
+    class="linkspot"
+    data-title="page10"
+    data-url="page10.html"
+    style="
+        left:0.10%;
+        top:2.11%;
+        width:8.93%;
+        height:96.02%;
+    ">
+</div>
+
+<div
+    class="linkspot"
+    data-title="page12"
+    data-url="page12.html"
+    style="
+        left:90.46%;
+        top:1.41%;
+        width:7.59%;
+        height:97.29%;
+    ">
+</div>
+
+<!--/********************************************
+PASTE ABOVE HERE
+********************************************/-->
+
+    </div>
+
+</div>
+
+<div id="status">
+    Click a hotspot. Double-click anywhere to reset.
+</div>
+
+<script>
+
+const viewer =
+    document.getElementById("viewer");
+
+const status =
+    document.getElementById("status");
+
+let currentArticleUrl = null;
+
+/********************************************
+STATUS CLICK
+********************************************/
+
+status.addEventListener(
+    "click",
+    function(){
+
+        if(!currentArticleUrl)
+            return;
+
+        window.location.href =
+            currentArticleUrl;
+    });
+
+/********************************************
+HOTSPOT CLICK
+********************************************/
+
+document
+    .querySelectorAll(".hotspot")
+    .forEach(hotspot => {
+
+        hotspot.addEventListener(
+            "click",
+            function(e){
+
+                e.stopPropagation();
+
+                zoomToHotspot(
+                    hotspot
+                );
+
+            });
+    });
+
+function zoomToHotspot(hotspot){
+
+    const rect =
+        hotspot.getBoundingClientRect();
+
+    const centerX =
+        rect.left +
+        rect.width / 2;
+
+    const centerY =
+        rect.top +
+        rect.height / 2;
+
+    const zoom = Math.min(
+
+        window.innerWidth /
+        (rect.width * 1.15),
+
+        window.innerHeight /
+        (rect.height * 1.15)
+
+    );
+
+    const tx =
+        (window.innerWidth / 2
+        - centerX) * zoom;
+
+    const ty =
+        (window.innerHeight / 2
+        - centerY) * zoom;
+
+    viewer.style.transform =
+
+        `
+        translate(-50%,-50%)
+        translate(${tx}px,${ty}px)
+        scale(${zoom})
+        `;
+
+    currentArticleUrl =
+        hotspot.dataset.url || null;
+
+if(currentArticleUrl){
+
+    status.textContent =
+        "Read: " +
+        hotspot.dataset.title;
+
+    status.classList.add(
+        "linkReady"
+    );
+
+}else{
+
+    status.textContent =
+        hotspot.dataset.title;
+
+    status.classList.remove(
+        "linkReady"
+    );
+}
+}
+
+/********************************************
+RESET
+********************************************/
+
+function resetView(){
+
+currentArticleUrl = null;
+
+status.classList.remove(
+    "linkReady"
+);
+
+    viewer.style.transform =
+        "translate(-50%,-50%) scale(1)";
+
+    status.textContent =
+        "Click a hotspot. Double-click anywhere to reset.";
+}
+
+document.addEventListener(
+    "dblclick",
+    function(e){
+
+        e.preventDefault();
+
+        resetView();
+
+    });
+
+/********************************************
+LINKSPOTS
+********************************************/
+
+document
+    .querySelectorAll(".linkspot")
+    .forEach(link => {
+
+        link.addEventListener(
+            "click",
+            function(e){
+
+                e.stopPropagation();
+
+                window.location.href =
+                    link.dataset.url;
+
+            });
+    });
+
+</script>
+
+</body>
+</html>
