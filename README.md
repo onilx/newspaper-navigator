@@ -7,4 +7,4 @@ By clicking on the story it will zoom you in, links to the rest of the story wil
 
 My current version is borrowing an early issue of The Daily Targum for whom I worked in the 2000s while in University as their Photo Editor and Web Editor.
 
-The highlight tool helps you create the html for the layout of each page but currently requires you to alter the name of the .jpg in the html.
+The hotspot tool helps you create the html for the layout of each page but currently requires you to alter the name of the .jpg in the html.
